@@ -3,66 +3,127 @@ import express from "express";
 
 const prisma = new PrismaClient()
 const app = express()
-const tokenEnv = process.env.API_TOKEN
+
+const middleware = async (req:any, res:any, next:any) => {
+    const excludedRoute = '/feed/:token';
+    if (req.path == excludedRoute){
+        return next();
+    }
+    
+    const tokenEnv = process.env.API_TOKEN
+
+    if(req.body.token != tokenEnv){
+        res.status(201).json('invalid token')
+    }
+    let { email, psswd } = req.body;
+
+    const validUser = await prisma.user.findUnique({
+        where: {
+            email: email,
+            password: psswd
+        }
+    })
+    
+
+    if(validUser?.email){
+        next();
+    }
+};
 
 app.use(express.json())
+app.use(middleware)
 
 app.get('/', (req, res) => {
     res.json('Hi there')
 })
 
-app.get('/login/:email/:password/:token',async (req:any, res:any) => {
-    const email = String(req.params.email)
-    const psswd = String(req.params.password)
-    const token = String(req.params.token)
+app.get('/login/:token',async (req:any, res:any) => {
+        let { email, psswd } = req.body
+        try{
+            const user = await prisma.user.findUnique({
+                where: {
+                    email: String(email),
+                    password: String(psswd),
+                },
+            })
 
-    if(token != tokenEnv){
-        res.json('Authentication Failed')
-    }else{
-        const user = await prisma.user.findUnique({
-            where: {
-                email: String(email),
-                password: String(psswd),
-            },
-        })
-
-        res.json(user)
-    }
+            res.status(200).json(user)
+        }catch(e){
+            res.status(201).json('Error: '+e)
+        }
 })
 
 app.get('/post/:token',async (req:any, res:any) => {
-    const token = String(req.params.token)
-
-    if(token != tokenEnv){
-        res.json('Authentication Failed')
-    }else{
         const feed = await prisma.post.findMany()
-        res.json(feed)
-    }
+        res.status(200).json(feed)
 })
 
 app.post('/post/:token',async (req: any, res: any) => {
-    const token = req.params.token
-
-    if(token != tokenEnv){
-        res.json('Authentication Failed')
-    }else{
+        let { title, content, authorId } = req.body;
         try{
             const post = await prisma.post.create({
                 data: {
-                    title: req.body.title,
-                    content: req.body.content,
+                    title: title,
+                    content: content,
                     published: true,
-                    author: req.body.author,
-                    authorId: req.body.authorId
+                    authorId: authorId
                 }
             })
 
-            res.json(post)
+            res.status(200).json(post)
         }catch(error){
-           res.json(error)
+           res.status(201).json(error)
         }
-    }
+})
+
+app.post('/user/:token',async (req:any, res:any) => {
+        try{
+            let { email, name, psswd } = req.body
+            const user = await prisma.user.create({
+                data: {
+                    email: email,
+                    name: name,
+                    password: psswd
+                }
+            })
+            res.status(200).json(user)
+        }catch(e){
+            res.status(201).json(e)
+        }
+})
+
+app.post('/projects/:token',async (req:any, res:any) => {
+        try{
+            let { title, imgUrl, link, repo } = req.body;
+            const project = prisma.projects.create({
+                data: {
+                    title: title,
+                    imgUrl: imgUrl,
+                    link: link,
+                    repository: repo
+                }
+            })
+            res.status(200).json(project)
+        }catch(e){
+            res.status(201).json(e)
+        }
+})
+
+app.post('/timeline/:token',async (req:any, res:any) => {
+        try{
+            let { title, year, duration, details } = req.body;
+            const timeline = prisma.timeline.create({
+                data: {
+                    title: title,
+                    year: year,
+                    duration: duration,
+                    details: details
+                }
+            })
+            res.status(200).json(timeline)
+        }catch(e){
+            res.status(201).json(e)
+        }
 })
 
 app.listen(3000, () =>
