@@ -30,10 +30,39 @@ app.get('/login/:email/:password/:token',async (req:any, res:any) => {
     }
 })
 
-app.get('/post',async (req:any, res:any) => {
-    const feed = await prisma.post.findMany()
+app.get('/post/:token',async (req:any, res:any) => {
+    const token = String(req.params.token)
 
-    res.json(feed)
+    if(token != tokenEnv){
+        res.json('Authentication Failed')
+    }else{
+        const feed = await prisma.post.findMany()
+        res.json(feed)
+    }
+})
+
+app.post('/post/:token',async (req: any, res: any) => {
+    const token = req.params.token
+
+    if(token != tokenEnv){
+        res.json('Authentication Failed')
+    }else{
+        try{
+            const post = await prisma.post.create({
+                data: {
+                    title: req.body.title,
+                    content: req.body.content,
+                    published: true,
+                    author: req.body.author,
+                    authorId: req.body.authorId
+                }
+            })
+
+            res.json(post)
+        }catch(error){
+           res.json(error)
+        }
+    }
 })
 
 app.listen(3000, () =>
