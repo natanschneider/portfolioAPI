@@ -28,3 +28,19 @@ model Post {
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  Int?
 }
+
+model Projects {
+  id          Int @default(autoincrement()) @id
+  title       String
+  imgUrl      String
+  link        String
+  repository  String
+}
+
+model Timeline {
+  id        Int @default(autoincrement()) @id
+  year      Int
+  title     String
+  duration  String
+  details   String
+}
