@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 const app = express()
 
 exports = module.exports = function (app:any){
-    app.post('/post',async (req: Request, res: Response) => {
+    app.post('/admin/post',async (req: Request, res: Response) => {
         let { title, content, authorId } = req.body;
         try{
             const post = await prisma.post.create({
@@ -23,7 +23,7 @@ exports = module.exports = function (app:any){
         }
     })
 
-    app.post('/user',async (req:Request, res:Response) => {
+    app.post('/admin/user',async (req:Request, res:Response) => {
         try{
             let { email, name, psswd } = req.body
             const user = await prisma.user.create({
@@ -39,7 +39,7 @@ exports = module.exports = function (app:any){
         }
     })
 
-    app.post('/projects',async (req:Request, res:Response) => {
+    app.post('/admin/projects',async (req:Request, res:Response) => {
         try{
             let { title, imgUrl, link, repo } = req.body;
             const project = prisma.projects.create({
@@ -56,7 +56,7 @@ exports = module.exports = function (app:any){
         }
     })
 
-    app.post('/timeline',async (req:any, res:any) => {
+    app.post('/admin/timeline',async (req:any, res:any) => {
         try{
             let { title, year, duration, details } = req.body;
             const timeline = prisma.timeline.create({
