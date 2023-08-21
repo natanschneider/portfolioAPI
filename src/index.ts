@@ -10,32 +10,32 @@ const middleware = async (req:Request, res:Response, next:NextFunction) => {
     try{
         res.header("Access-Control-Allow-Origin", "*")
         res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,PATCH,OPTIONS")
-        const excludedRoute = '/feed';
-        if (req.path == excludedRoute){
-            return next();
-        }
-        
-        const tokenEnv = process.env.API_TOKEN
 
-        if(req.body.token != tokenEnv){
-            console.log(req.body.token)
-            res.status(201).json('invalid token')
-            return;
-        }
-        let { email, psswd } = req.body;
+        if(req.path.startsWith('/admin')){ 
+            const tokenEnv = process.env.API_TOKEN
 
-        const validUser = await prisma.user.findUnique({
-            where: {
-                email: email,
-                password: psswd
+            if(req.body.token != tokenEnv){
+                console.log(req.body.token)
+                res.status(201).json('invalid token')
+                return;
             }
-        })
-        
+            let { email, psswd } = req.body;
 
-        if(validUser?.email && validUser?.password){
-            next();
+            const validUser = await prisma.user.findUnique({
+                where: {
+                    email: email,
+                    password: psswd
+                }
+            })
+            
+
+            if(validUser?.email && validUser?.password){
+                next();
+            }else{
+                res.status(201).json('Não foi possivel fazer login')
+            }
         }else{
-            res.status(201).json('Não foi possivel fazer login')
+            return next()
         }
     }catch(e){
         res.status(201).json('Não foi possivel fazer login')
