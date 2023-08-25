@@ -28,4 +28,17 @@ exports = module.exports = function(app:any){
             const feed = await prisma.post.findMany()
             res.status(200).json(feed)
     })
+
+    app.get('/post', async (req:Request, res:Response) => {
+        try{
+            const post = await prisma.post.findUnique({
+                where: {
+                    id: Number(req.query.id)
+                },
+            })
+            res.status(200).json(post)
+        }catch(e){
+            res.status(201).json('Error: '+e);
+        }
+    });
 }
