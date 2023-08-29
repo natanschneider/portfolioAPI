@@ -58,12 +58,13 @@ exports = module.exports = function (app:any){
 
     app.post('/admin/timeline',async (req:any, res:any) => {
         try{
-            let { title, year, duration, details } = req.body;
+            let { title, year, details, start, end } = req.body;
             const timeline = prisma.timeline.create({
                 data: {
                     title: title,
                     year: year,
-                    duration: duration,
+                    start: start,
+                    end: end,
                     details: details
                 }
             })
