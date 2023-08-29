@@ -27,6 +27,7 @@ model Post {
   published Boolean @default(false)
   author    User?   @relation(fields: [authorId], references: [id])
   authorId  Int?
+  createAt  DateTime @default(now())
 }
 
 model Projects {
@@ -41,6 +42,7 @@ model Timeline {
   id        Int @default(autoincrement()) @id
   year      Int
   title     String
-  duration  String
+  start     DateTime
+  end       DateTime
   details   String
 }
