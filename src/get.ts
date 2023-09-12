@@ -41,4 +41,13 @@ exports = module.exports = function(app:any){
             res.status(201).json('Error: '+e);
         }
     });
+
+    app.get('/timeline',async (req:Request, res:Response) => {
+        try{
+            const timeline = await prisma.timeline.findMany()
+            res.status(200).json(timeline)
+        }catch(e){
+            res.status(201).json('Error: '+e)
+        }
+    })
 }
