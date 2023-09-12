@@ -8,7 +8,7 @@ exports = module.exports = function(app:any){
         res.json('Hi there')
     })
 
-    app.get('/login',async (req:Request, res:Response) => {
+    app.post('/login',async (req:Request, res:Response) => {
             let { email, psswd } = req.body
             try{
                 const user = await prisma.user.findUnique({
