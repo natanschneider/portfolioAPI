@@ -1,48 +1,45 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL")
-  directUrl = env("POSTGRES_URL_NON_POOLING")
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL")
+  directUrl         = env("POSTGRES_URL_NON_POOLING")
   shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  name  String?
-  posts Post[]
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String?
   password String
+  posts    Post[]
 }
 
 model Post {
-  id        Int     @default(autoincrement()) @id
+  id        Int      @id @default(autoincrement())
   title     String
   content   String?
-  published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
+  published Boolean  @default(false)
   authorId  Int?
   createAt  DateTime @default(now())
+  author    User?    @relation(fields: [authorId], references: [id])
 }
 
 model Projects {
-  id          Int @default(autoincrement()) @id
-  title       String
-  imgUrl      String
-  link        String
-  repository  String
+  id         Int    @id @default(autoincrement())
+  title      String
+  imgUrl     String
+  link       String
+  repository String
 }
 
 model Timeline {
-  id        Int @default(autoincrement()) @id
-  year      Int
-  title     String
-  start     DateTime
-  end       DateTime
-  details   String
+  id      Int      @id @default(autoincrement())
+  year    Int
+  title   String
+  start   DateTime
+  end     DateTime
+  details String
 }
